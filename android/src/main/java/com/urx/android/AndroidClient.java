@@ -62,7 +62,7 @@ public class AndroidClient extends Client {
      * @param resultsHandler A callback to handle both success and failure of performing a search query
      */
     @Override
-    public void query(final Query query, final ResponseHandler<SearchResults> resultsHandler, final boolean sync) {
+    public void query(final Query query, final ResponseHandler<SearchResults> resultsHandler) {
         cachedGet(buildUrl(query), new ResponseHandler<String>() {
             @Override
             public void onSuccess(String response) {
@@ -73,7 +73,30 @@ public class AndroidClient extends Client {
             public void onFailure(ApiException failure) {
                 resultsHandler.onFailure(failure);
             }
-        }, queryProgressReporter, sync);
+        }, queryProgressReporter, false);
+    }
+    
+    /**
+     * Performs a search query using a well-formed {@link Query}.
+     * Upon success, the {@link ResponseHandler#onSuccess} method is invoked with the resulting {@link SearchResults},
+     * and upon failure, the {@link ResponseHandler#onFailure} method is invoked with the resulting
+     * {@link ApiException}. Note that queries are cached in this implementation for network performance reasons.
+     * @param query A well-formed {@link Query} object
+     * @param resultsHandler A callback to handle both success and failure of performing a search query
+     */
+    @Override
+    public void querySync(final Query query, final ResponseHandler<SearchResults> resultsHandler) {
+        cachedGet(buildUrl(query), new ResponseHandler<String>() {
+            @Override
+            public void onSuccess(String response) {
+                resultsHandler.onSuccess(new SearchResults(query, response));
+            }
+
+            @Override
+            public void onFailure(ApiException failure) {
+                resultsHandler.onFailure(failure);
+            }
+        }, queryProgressReporter, true);
     }
 
     /**
@@ -86,7 +109,7 @@ public class AndroidClient extends Client {
      * @param resolutionHandler A callback to handle both success and failure of performing deeplink resolution
      */
     @Override
-    public void resolve(final Resolve resolve, final ResponseHandler<Resolution> resolutionHandler, final boolean sync) {
+    public void resolve(final Resolve resolve, final ResponseHandler<Resolution> resolutionHandler) {
         cachedGet(buildUrl(resolve), new ResponseHandler<String>() {
             @Override
             public void onSuccess(String response) {
@@ -97,7 +120,31 @@ public class AndroidClient extends Client {
             public void onFailure(ApiException failure) {
                 resolutionHandler.onFailure(failure);
             }
-        }, resolveProgressReporter, sync);
+        }, resolveProgressReporter, false);
+    }
+    
+    /**
+     * Performs resolution to get the corresponding deeplinks for a given URI.
+     * Upon success, the {@link ResponseHandler#onSuccess} method is invoked with the resulting {@link Resolution}, and
+     * upon failure, the {@link ResponseHandler#onFailure} method is invoked with the resulting {@link ApiException}.
+     * Note that a {@link SearchResult} may be used as a {@link Resolve} for convenience. Also note that resolves are
+     * cached in this implementation for network performance reasons.
+     * @param resolve A {@link Resolve} object containing the URI to resolve
+     * @param resolutionHandler A callback to handle both success and failure of performing deeplink resolution
+     */
+    @Override
+    public void resolveSync(final Resolve resolve, final ResponseHandler<Resolution> resolutionHandler) {
+        cachedGet(buildUrl(resolve), new ResponseHandler<String>() {
+            @Override
+            public void onSuccess(String response) {
+                resolutionHandler.onSuccess(new Resolution(response));
+            }
+
+            @Override
+            public void onFailure(ApiException failure) {
+                resolutionHandler.onFailure(failure);
+            }
+        }, resolveProgressReporter, true);
     }
 
     /**
