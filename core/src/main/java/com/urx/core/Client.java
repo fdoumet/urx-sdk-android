@@ -80,8 +80,9 @@ public abstract class Client {
      * resulting {@link ApiException}
      * @param query A well-formed {@link Query} object
      * @param resultsHandler A callback to handle both success and failure of performing a search query
+     * @param sync Whether the call should be synchronized
      */
-    public abstract void query(final Query query, final ResponseHandler<SearchResults> resultsHandler);
+    public abstract void query(final Query query, final ResponseHandler<SearchResults> resultsHandler, final boolean sync);
 
     /**
      * Performs resolution to get the corresponding deeplinks for a given URI.
@@ -90,6 +91,7 @@ public abstract class Client {
      * resulting {@link ApiException}. Note that a {@link SearchResult} may be used as a {@link Resolve} for convenience.
      * @param resolve A {@link Resolve} object containing the URI to resolve
      * @param resolutionHandler A callback to handle both success and failure of performing deeplink resolution
+     * @param sync Whether the call should be synchronized
      */
-    public abstract void resolve(final Resolve resolve, final ResponseHandler<Resolution> resolutionHandler);
+    public abstract void resolve(final Resolve resolve, final ResponseHandler<Resolution> resolutionHandler, final boolean sync);
 }

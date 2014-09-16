@@ -4,16 +4,19 @@
 package com.urx.android;
 
 import android.os.Build;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.SyncHttpClient;
 import com.urx.core.*;
 import com.urx.core.resolution.Resolution;
 import com.urx.core.resolution.Resolve;
 import com.urx.core.search.SearchResult;
 import com.urx.core.search.SearchResults;
 import com.urx.core.search.query.Query;
+
 import org.apache.http.Header;
 
 import java.util.Map;
@@ -24,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class AndroidClient extends Client {
     protected final AsyncHttpClient client;
+    protected final SyncHttpClient syncedClient;
     protected final Cache<String, String> responseCache;
     protected ProgressReporter queryProgressReporter = ProgressReporter.NOOP_REPORTER;
     protected ProgressReporter resolveProgressReporter = ProgressReporter.NOOP_REPORTER;
@@ -39,6 +43,9 @@ public class AndroidClient extends Client {
         client = new AsyncHttpClient();
         client.setUserAgent(config.userAgent);
         client.setEnableRedirects(false);
+        syncedClient = new SyncHttpClient();
+        syncedClient.setUserAgent(config.userAgent);
+        syncedClient.setEnableRedirects(false);
         // TODO: Should we expose these settings to be tweaked?
         responseCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)
@@ -55,7 +62,7 @@ public class AndroidClient extends Client {
      * @param resultsHandler A callback to handle both success and failure of performing a search query
      */
     @Override
-    public void query(final Query query, final ResponseHandler<SearchResults> resultsHandler) {
+    public void query(final Query query, final ResponseHandler<SearchResults> resultsHandler, final boolean sync) {
         cachedGet(buildUrl(query), new ResponseHandler<String>() {
             @Override
             public void onSuccess(String response) {
@@ -66,7 +73,7 @@ public class AndroidClient extends Client {
             public void onFailure(ApiException failure) {
                 resultsHandler.onFailure(failure);
             }
-        }, queryProgressReporter);
+        }, queryProgressReporter, sync);
     }
 
     /**
@@ -79,7 +86,7 @@ public class AndroidClient extends Client {
      * @param resolutionHandler A callback to handle both success and failure of performing deeplink resolution
      */
     @Override
-    public void resolve(final Resolve resolve, final ResponseHandler<Resolution> resolutionHandler) {
+    public void resolve(final Resolve resolve, final ResponseHandler<Resolution> resolutionHandler, final boolean sync) {
         cachedGet(buildUrl(resolve), new ResponseHandler<String>() {
             @Override
             public void onSuccess(String response) {
@@ -90,14 +97,15 @@ public class AndroidClient extends Client {
             public void onFailure(ApiException failure) {
                 resolutionHandler.onFailure(failure);
             }
-        }, resolveProgressReporter);
+        }, resolveProgressReporter, sync);
     }
 
     /**
      * Resets the HTTP headers on the client
      * @param headers A map of HTTP headers to be set on the outgoing request
+     * @param client The client that needs its headers reset
      */
-    protected void resetHeaders(final Map<String, String> headers) {
+    protected void resetHeaders(AsyncHttpClient client, final Map<String, String> headers) {
         client.removeAllHeaders();
         for (final Map.Entry<String, String> entry : headers.entrySet()) {
             client.addHeader(entry.getKey(), entry.getValue());
@@ -111,14 +119,15 @@ public class AndroidClient extends Client {
      * @param url The API endpoint to invoke
      * @param responseHandler A callback object for handling success/failure
      * @param progressReporter The callback object to report the progress of the current API call
+     * @param sync Whether the call should be synchronized
      */
     protected void cachedGet(final String url, final ResponseHandler<String> responseHandler,
-                             final ProgressReporter progressReporter) {
+                             final ProgressReporter progressReporter, final boolean sync) {
         final String cachedResponse = responseCache.getIfPresent(url);
         if (cachedResponse != null) {
             responseHandler.onSuccess(cachedResponse);
         } else {
-            get(url, new ResponseHandler<String>() {
+        	ResponseHandler<String> rh = new ResponseHandler<String>() {
                 @Override
                 public void onSuccess(String response) {
                     responseCache.put(url, response);
@@ -129,7 +138,12 @@ public class AndroidClient extends Client {
                 public void onFailure(ApiException failure) {
                     responseHandler.onFailure(failure);
                 }
-            }, progressReporter);
+            };
+            
+            if (!sync)
+            	get(url, rh, progressReporter);
+            else
+            	synchedGet(url, rh, progressReporter);
         }
     }
 
@@ -141,8 +155,27 @@ public class AndroidClient extends Client {
      * @param progressReporter The callback object to report the progress of the current API call
      */
     protected void get(final String url, final ResponseHandler<String> responseHandler,
+            final ProgressReporter progressReporter)
+    {
+    	get(client, url, responseHandler, progressReporter);
+    }
+    
+    /**
+     * Executes the underlying GET request against an API endpoint. The relevant callbacks are invoked for handling the
+     * response success or failure, in addition to reporting the progress updates of the execution as necessary.
+     * @param url The API endpoint to invoke
+     * @param responseHandler A callback object for handling success/failure
+     * @param progressReporter The callback object to report the progress of the current API call
+     */
+    protected void synchedGet(final String url, final ResponseHandler<String> responseHandler,
+            final ProgressReporter progressReporter)
+    {
+    	get(syncedClient, url, responseHandler, progressReporter);
+    }
+    
+    private void get(AsyncHttpClient client, final String url, final ResponseHandler<String> responseHandler,
                        final ProgressReporter progressReporter) {
-        resetHeaders(buildApiHeaders());
+        resetHeaders(client, buildApiHeaders());
         progressReporter.onStart();
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
