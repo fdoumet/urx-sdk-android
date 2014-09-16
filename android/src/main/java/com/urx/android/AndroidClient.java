@@ -105,7 +105,7 @@ public class AndroidClient extends Client {
      * @param headers A map of HTTP headers to be set on the outgoing request
      * @param client The client that needs its headers reset
      */
-    protected void resetHeaders(AsyncHttpClient client, final Map<String, String> headers) {
+    protected void resetHeaders(final AsyncHttpClient client, final Map<String, String> headers) {
         client.removeAllHeaders();
         for (final Map.Entry<String, String> entry : headers.entrySet()) {
             client.addHeader(entry.getKey(), entry.getValue());
@@ -173,7 +173,7 @@ public class AndroidClient extends Client {
     	get(syncedClient, url, responseHandler, progressReporter);
     }
     
-    private void get(AsyncHttpClient client, final String url, final ResponseHandler<String> responseHandler,
+    private void get(final AsyncHttpClient client, final String url, final ResponseHandler<String> responseHandler,
                        final ProgressReporter progressReporter) {
         resetHeaders(client, buildApiHeaders());
         progressReporter.onStart();
