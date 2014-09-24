@@ -65,7 +65,7 @@ See this SDK fully integrated into an [example Android app](https://github.com/U
 
 Contributing
 ------------
-TODO
+(Coming soon...)
 
 License
 -------
@@ -87,4 +87,4 @@ Documentation, Features and Examples
 ------------------------------------
 Full details and documentation can be found on the project page here:
 
-http://a20364ad4f723e94bb34d675e89a88a5.s3-website-us-east-1.amazonaws.com/
+http://developers.urx.com/
