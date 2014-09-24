@@ -8,7 +8,7 @@ This installation tutorial will show you how to add URXSearch to an existing pro
 
 **You will learn how to:**
 
-- Insert the SDK into your iOS app
+- Insert the SDK into your Android app
 - Set your API Key
 - Query the URX Search API for card content
 
@@ -72,7 +72,7 @@ See this SDK fully integrated into an [example Android app](https://github.com/U
 
 Contributing
 ------------
-(Coming soon...)
+Coming soon...
 
 License
 -------
