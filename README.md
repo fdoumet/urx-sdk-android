@@ -1,9 +1,16 @@
 URX Android SDK
 ===============
 
-This is the SDK interface for the [URX App Search API](http://a20364ad4f723e94bb34d675e89a88a5.s3-website-us-east-1.amazonaws.com/).
+This is the SDK interface for the [URX App Search API](http://developers.urx.com/).
 
-TODO
+
+This installation tutorial will show you how to add URXSearch to an existing project, and how to keep it up-to-date.
+
+**You will learn how to:**
+
+- Insert the SDK into your iOS app
+- Set your API Key
+- Query the URX Search API for card content
 
 Installation
 ------------
