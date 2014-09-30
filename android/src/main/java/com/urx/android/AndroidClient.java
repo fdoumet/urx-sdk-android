@@ -35,7 +35,7 @@ public class AndroidClient extends Client {
     public AndroidClient(final ClientConfig config) {
         super(config);
         // TODO: Maybe this can be put somewhere else?
-        config.userAgent = "urx-client-1.0-android-" + Build.VERSION.RELEASE;
+        config.userAgent = "urx-client/0.1 (android; " + Build.VERSION.RELEASE + ")";
         client = new AsyncHttpClient();
         client.setUserAgent(config.userAgent);
         client.setEnableRedirects(false);
