@@ -10,6 +10,8 @@ package com.urx.core.search.query;
 public enum FilterType implements Value {
     Domain("domain"),
     Action("action"),
+    Limit("limit"),
+    Offset("offset"),
     // TODO: Remove the remaining ones for now?
     Date("date"),
     Near("near"),
