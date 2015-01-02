@@ -34,8 +34,10 @@ public class SimpleResolver extends AndroidResolver {
      */
     @Override
     public Intent buildIntent(final Resolution resolution) {
-        Intent go = new Intent(Intent.ACTION_VIEW);
         final String uri = resolution.deeplink != null ? resolution.deeplink : resolution.webUrl;
+        if (uri == null)
+        	return null;
+        Intent go = new Intent(Intent.ACTION_VIEW);
         go.setData(Uri.parse(uri));
         return go;
     }
