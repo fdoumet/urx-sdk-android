@@ -53,8 +53,6 @@ public abstract class AndroidResolver extends ResponseHandler<Resolution> {
      */
     @Override
     public void onSuccess(final Resolution resolution) {
-    	Intent intent = buildIntent(resolution);
-    	if (intent != null)
-    		context.startActivity(intent);
+        context.startActivity(buildIntent(resolution));
     }
 }

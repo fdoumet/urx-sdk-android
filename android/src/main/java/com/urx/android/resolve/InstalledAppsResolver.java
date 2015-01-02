@@ -47,8 +47,6 @@ public class InstalledAppsResolver extends SimpleResolver {
     @Override
     public Intent buildIntent(Resolution resolution) {
         Intent go = super.buildIntent(resolution);
-        if (go == null)
-        	return null;
         if (resolution.deeplink != null && canOpenDeeplink(go)) {
             return go;
         } else {

@@ -19,8 +19,4 @@ public abstract class ResponseHandler<R> {
      * @param failure The {@link ApiException} coming back from the API call on failure
      */
     public void onFailure(ApiException failure) {}
-    /**
-     * Default implementation of cancel callback does ABSOLUTELY NOTHING!
-     */
-    public void onCancel() {}
 }
