@@ -74,7 +74,7 @@ public class AndroidClient extends Client {
             public void onFailure(ApiException failure) {
                 resultsHandler.onFailure(failure);
             }
-            
+           
             @Override
             public void onCancel(){
             	resultsHandler.onCancel();
@@ -131,7 +131,7 @@ public class AndroidClient extends Client {
             public void onFailure(ApiException failure) {
                 resolutionHandler.onFailure(failure);
             }
-            
+           
             @Override
             public void onCancel(){
             	resolutionHandler.onCancel();
@@ -206,7 +206,7 @@ public class AndroidClient extends Client {
                 public void onFailure(ApiException failure) {
                     responseHandler.onFailure(failure);
                 }
-                
+        
                 @Override
                 public void onCancel(){
                 	responseHandler.onCancel();
